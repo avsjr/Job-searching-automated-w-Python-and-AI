@@ -1,0 +1,32 @@
+name: Bot Diário de Vagas Dados
+
+on:
+  schedule:
+    # Roda às 08:00 UTC (05:00 BRT) de Segunda a Sexta
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch: # Permite rodar manualmente clicando em um botão
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Executar o Motor ETL
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          CREDENCIAIS_JSON: ${{ secrets.CREDENCIAIS_JSON }}
+        run: python bot_dados.py
